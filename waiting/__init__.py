@@ -6,8 +6,9 @@ from .exceptions import TimeoutExpired
 def wait(predicate, timeout_seconds=None, sleep_seconds=1):
     while True:
         timeout = _make_deadline(timeout_seconds)
-        if predicate():
-            return
+        result = predicate()
+        if result:
+            return result
         if timeout.is_expired():
             raise TimeoutExpired()
         _sleep(sleep_seconds)

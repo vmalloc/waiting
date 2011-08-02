@@ -13,10 +13,18 @@ Waiting forever is very simple::
 
  >>> from waiting import wait
  >>> wait(predicate)
+ True
 
+If your predicate returns a value, it will be returned as the result of wait()::
+
+ >>> result = object()
+ >>> wait(lambda: result) is result
+ True
+ 
 A *timeout* parameter can also be specified::
 
  >>> wait(predicate, timeout_seconds=10.5)
+ True
 
 When a timeout expires without the predicate being fullfilled, an exception is thrown::
 
@@ -29,3 +37,5 @@ When a timeout expires without the predicate being fullfilled, an exception is t
 Sleeping polls the predicate at a certain interval (by default 1 second). The interval can be changed with the *sleep_seconds* argument::
 
  >>> wait(predicate, sleep_seconds=20)
+ True
+

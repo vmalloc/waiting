@@ -11,7 +11,7 @@ The most basic usage is when you have a function you want to wait for::
 
 Waiting forever is very simple::
 
- >>> from waiting import wait
+ >>> from waiting import wait, TimeoutExpired
  >>> wait(predicate)
  True
 
@@ -28,10 +28,14 @@ A *timeout* parameter can also be specified::
 
 When a timeout expires without the predicate being fullfilled, an exception is thrown::
 
- >>> wait(lambda : False, timeout_seconds=0) # doctest: +IGNORE_EXCEPTION_DETAIL
- Traceback (most recent call last):
-  ...
- TimeoutExpired
+
+ >>> try:
+ ...     wait(lambda : False, timeout_seconds=0)
+ ... except TimeoutExpired:
+ ...     # expired!
+ ...     pass
+ ... else:
+ ...     assert False
  
  
 Sleeping polls the predicate at a certain interval (by default 1 second). The interval can be changed with the *sleep_seconds* argument::

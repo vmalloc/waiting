@@ -3,7 +3,7 @@ import itertools
 from setuptools import setup, find_packages
 
 with open(os.path.join(os.path.dirname(__file__), "waiting", "__version__.py")) as version_file:
-    exec version_file.read()
+    exec(version_file.read())
 
 setup(name="waiting",
       classifiers = [
@@ -15,7 +15,7 @@ setup(name="waiting",
       author_email="vmalloc@gmail.com",
       version=__version__,
       packages=find_packages(exclude=["tests"]),
-      install_requires=[],
+      install_requires=["pyforge"],
       scripts=[],
       namespace_packages=[]
       )

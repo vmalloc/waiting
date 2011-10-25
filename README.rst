@@ -43,3 +43,10 @@ Sleeping polls the predicate at a certain interval (by default 1 second). The in
  >>> wait(predicate, sleep_seconds=20)
  True
 
+When waiting for multiple predicates, *waiting* provides two simple facilities to help aggregate them: **ANY** and **ALL**. They resemble Python's built-in *any()* and *all()*, except that they don't call a predicate once it has been satisfied (this is useful when the predicates are inefficient and take time to complete)::
+
+ >>> from waiting import wait, ANY, ALL
+ >>> wait(ANY([predicate, predicate]))
+ True
+ >>> wait(ALL([predicate, predicate]))
+ True

@@ -4,8 +4,8 @@ from .deadlines import make_deadline as _make_deadline
 from .exceptions import TimeoutExpired
 
 def wait(predicate, timeout_seconds=None, sleep_seconds=1):
+    timeout = _make_deadline(timeout_seconds)
     while True:
-        timeout = _make_deadline(timeout_seconds)
         result = predicate()
         if result:
             return result

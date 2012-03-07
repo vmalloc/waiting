@@ -1,23 +1,39 @@
 from forge import ForgeTestCase
 import waiting
 
-class SleepTest(ForgeTestCase):
+class WaitingTest(ForgeTestCase):
     def setUp(self):
-        super(SleepTest, self).setUp()
-        self.forge.replace(waiting, "_sleep")
-        self.predicate = self.forge.create_wildcard_mock()
-    def test__sleep_between_tries_default(self):
-        self._test__sleep_between_tries()
-    def test__sleep_between_tries_different_sleep_value(self):
-        self._test__sleep_between_tries(3.4)
-    def _test__sleep_between_tries(self, sleep_seconds=None):
-        for i in range(5):
-            self.predicate().and_return(False)
-            waiting._sleep(1 if sleep_seconds is None else sleep_seconds)
-        self.predicate().and_return(True)
-        self.forge.replay()
-        waiting.wait(self.predicate, **(dict(sleep_seconds=sleep_seconds) if sleep_seconds is not None else {}))
-
+        super(WaitingTest, self).setUp()
+        self.virtual_time = 0
+        self.sleeps_performed = []
+        self.predicate_satisfied = False
+        self.satisfy_at_time = None
+        self.satisfy_after_time = None
+        self.forge.replace_with(waiting, "_sleep", self._sleep)
+        self.forge.replace_with(waiting, "_time", self._time)
+        self.forge.replace_with(waiting.deadlines, "_time", self._time)
+    def predicate(self):
+        if self.satisfy_at_time is not None and self.satisfy_at_time == self.virtual_time:
+            self.predicate_satisfied = True
+        if self.satisfy_after_time is not None and self.satisfy_after_time <= self.virtual_time:
+            self.predicate_satisfied = True
+        return self.predicate_satisfied
+    def _sleep(self, delta):
+        self.sleeps_performed.append(delta)
+        self.virtual_time += delta
+        self.assertGreater(1000, self.virtual_time)
+        self.assertGreater(1000, len(self.sleeps_performed))
+    def _time(self):
+        return self.virtual_time
+    def test__waiting_does_not_expire(self):
+        num_tries = 9
+        sleep_seconds = 10
+        self.satisfy_at_time = num_tries * sleep_seconds
+        waiting.wait(self.predicate, sleep_seconds=sleep_seconds, timeout_seconds=(sleep_seconds*num_tries)+1)
+    def test__waiting_expires(self):
+        with self.assertRaises(waiting.TimeoutExpired):
+            waiting.wait(self.predicate, sleep_seconds=3, timeout_seconds=5) # timeout_seconds intentionally not divided by sleep
+        self.assertEquals(self.virtual_time, 5)
 
 class AggregationTest(ForgeTestCase):
     def setUp(self):

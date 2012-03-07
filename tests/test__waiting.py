@@ -21,8 +21,7 @@ class WaitingTest(ForgeTestCase):
     def _sleep(self, delta):
         self.sleeps_performed.append(delta)
         self.virtual_time += delta
-        self.assertGreater(1000, self.virtual_time)
-        self.assertGreater(1000, len(self.sleeps_performed))
+        self.assertGreater(1000, len(self.sleeps_performed), "Infinite loop")
     def _time(self):
         return self.virtual_time
     def test__waiting_does_not_expire(self):

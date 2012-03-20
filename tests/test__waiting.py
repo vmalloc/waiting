@@ -66,7 +66,7 @@ class AggregationTest(VirtualTimeTest):
         waiting.wait(waiting.ANY(self.predicates))
         self.assertEquals(self.virtual_time, 0)
     def test__wait_all(self):
-        for iteration in xrange(len(self.predicates) * 2, 0, -1):
+        for iteration in range(len(self.predicates) * 2, 0, -1):
             iteration -= 1
             for index, p in reversed(list(enumerate(self.predicates))):
                 if index > iteration:

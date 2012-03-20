@@ -49,7 +49,7 @@ class ANY(Aggregate):
         return any(p() for p in self.predicates)
 class ALL(Aggregate):
     def __call__(self):
-        for index in xrange(len(self.predicates), 0, -1):
+        for index in range(len(self.predicates), 0, -1):
             index -= 1
             if self.predicates[index]():
                 self.predicates.pop(index)

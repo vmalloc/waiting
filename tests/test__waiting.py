@@ -18,14 +18,30 @@ class VirtualTimeTest(ForgeTestCase):
         self.assertGreater(1000, len(self.sleeps_performed), "Infinite loop")
     def _time(self):
         return self.virtual_time
-
-class WaitingTest(VirtualTimeTest):
     def predicate(self):
         if self.satisfy_at_time is not None and self.satisfy_at_time == self.virtual_time:
             self.predicate_satisfied = True
         if self.satisfy_after_time is not None and self.satisfy_after_time <= self.virtual_time:
             self.predicate_satisfied = True
         return self.predicate_satisfied
+
+class ExponentialSleepTest(VirtualTimeTest):
+    def test__exponential_sleep_start_end_multiplier(self):
+        self._test__exponential_sleep([1, 2, 4, 8, 16, 32, 64, 100, 100], (1, 100, 2))
+    def test__exponential_sleep_start_end_multiplier_3(self):
+        self._test__exponential_sleep([1, 3, 9, 27, 81, 101, 101, 101], (1, 101, 3))
+    def test__exponential_sleep_start_end_no_multiplier(self):
+        self._test__exponential_sleep([1, 2, 4, 8, 16, 32, 64, 128, 201], (1, 201))
+    def test__exponential_sleep_start_end_no_end_with_multiplier(self):
+        self._test__exponential_sleep([1, 3, 9, 27, 81], (1, None, 3))
+    def test__exponential_sleep_start_end_no_end_no_multiplier(self):
+        self._test__exponential_sleep([1, 2, 4, 8, 16, 32, 64, 128, 256, 512], (1, None))
+    def _test__exponential_sleep(self, sleeps, sleep_seconds_arg):
+        self.satisfy_after_time = sum(sleeps)
+        waiting.wait(self.predicate, sleep_seconds=sleep_seconds_arg)
+        self.assertEquals(sleeps, self.sleeps_performed)
+
+class WaitingTest(VirtualTimeTest):
     def test__waiting_does_not_expire(self):
         num_tries = 9
         sleep_seconds = 10

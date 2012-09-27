@@ -50,3 +50,15 @@ When waiting for multiple predicates, *waiting* provides two simple facilities t
  True
  >>> wait(ALL([predicate, predicate]))
  True
+
+Exponential backoff is supported for the sleep interval::
+
+ >>> from waiting import wait
+ >>> wait(predicate, sleep_seconds=(1, 100)) # sleep 1, 2, 4, 8, 16, 32, 64, 100, 100, ....
+ True
+ >>> wait(predicate, sleep_seconds=(1, 100, 3)) # sleep 1, 3, 9, 27, 81, 100, 100, 100 ....
+ True
+ >>> wait(predicate, sleep_seconds=(1, None)) # sleep 1, 2, 4, 6, .... (infinity)
+ True
+ >>> wait(predicate, sleep_seconds=(1, None, 4)) # sleep 1, 4, 16, 64, ... (infinity)
+ True

@@ -15,13 +15,14 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None):
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
+    sleep_generator = _get_sleep_generator(timeout, sleep_seconds)
     while True:
         result.result = predicate()
         if result.result:
             return
         if timeout.is_expired():
             raise TimeoutExpired()
-        with _end_sleeping(_get_sleep_time(timeout, sleep_seconds)):
+        with _end_sleeping(next(sleep_generator)):
             yield
 
 @contextmanager
@@ -33,12 +34,23 @@ def _end_sleeping(total_seconds):
 class _Result(object):
     result = None
 
-def _get_sleep_time(timeout, sleep_seconds):
-    time_remaining = timeout.get_num_seconds_remaining()
-    assert time_remaining != 0
-    if time_remaining is not None:
-        sleep_seconds = min(time_remaining, sleep_seconds)
-    return max(0, sleep_seconds)
+def _get_sleep_generator(timeout, sleep_seconds):
+    if type(sleep_seconds) not in (tuple, list):
+        sleep_seconds = (sleep_seconds, sleep_seconds, 1)
+    if len(sleep_seconds) <= 2:
+        sleep_seconds = (sleep_seconds[0], sleep_seconds[1], 2)
+    elif len(sleep_seconds) < 2:
+        sleep_seconds = (sleep_seconds[0], None, 2)
+    current_sleep, end_sleep, multiplier = sleep_seconds
+    while True:
+        time_remaining = timeout.get_num_seconds_remaining()
+        if time_remaining is not None:
+            current_sleep = min(time_remaining, current_sleep)
+        current_sleep = max(0, current_sleep)
+        yield current_sleep
+        current_sleep *= multiplier
+        if end_sleep is not None:
+            current_sleep = min(end_sleep, current_sleep)
 
 class Aggregate(object):
     def __init__(self, predicates):

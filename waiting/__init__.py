@@ -22,7 +22,7 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
         if result.result:
             return
         if timeout.is_expired():
-            raise TimeoutExpired("Timeout of {0} seconds expired {1}".format(timeout_seconds, wait_msg))
+            raise TimeoutExpired(timeout_seconds, waiting_for)
         with _end_sleeping(next(sleep_generator)):
             yield
 

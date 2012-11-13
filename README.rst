@@ -53,10 +53,11 @@ When waiting for multiple predicates, *waiting* provides two simple facilities t
 
 TimeoutExpired exceptions, by default, don't tell you much about what didn't happen that you were expecting. To fix that, use the *waiting_for* argument::
 
- >>> wait(lambda : False, timeout_seconds=0, waiting_for="something that will never happen") #doctest: +ELLIPSIS
- Traceback (most recent call last):
-    ...
- TimeoutExpired: Timeout of 0 seconds expired waiting for something that will never happen
+ >>> try:
+ ...     wait(lambda : False, timeout_seconds=0, waiting_for="something that will never happen") #doctest: +ELLIPSIS
+ ... except TimeoutExpired as e:
+ ...     print(e)
+ Timeout of 0 seconds expired waiting for something that will never happen
 
 Exponential backoff is supported for the sleep interval::
 

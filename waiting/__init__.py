@@ -11,17 +11,18 @@ def wait(*args, **kwargs):
         pass
     return result.result
 
-def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None):
+def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None):
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
+    wait_msg = "waiting for {0}".format(waiting_for if waiting_for is not None else predicate)
     sleep_generator = _get_sleep_generator(timeout, sleep_seconds)
     while True:
         result.result = predicate()
         if result.result:
             return
         if timeout.is_expired():
-            raise TimeoutExpired()
+            raise TimeoutExpired("Timeout of {0} seconds expired {1}".format(timeout_seconds, wait_msg))
         with _end_sleeping(next(sleep_generator)):
             yield
 

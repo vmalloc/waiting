@@ -2,6 +2,8 @@ Overview
 --------
 *waiting* is a small library for waiting for stuff to happen. It basically waits for a function to return **True**, in various modes.
 
+*Waiting* is compatible with `flux <http://flux.readthedocs.org>`_ for simulated timelines.
+
 Usage
 -----
 

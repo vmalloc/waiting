@@ -1,7 +1,10 @@
 from .__version__ import __version__
 from contextlib import contextmanager
-from time import sleep as _sleep
-from time import time as _time
+
+try:
+    from flux import current_timeline as time_module
+except ImportError:
+    import time as time_module
 from .deadlines import make_deadline as _make_deadline
 from .exceptions import TimeoutExpired
 
@@ -30,7 +33,7 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
 def _end_sleeping(total_seconds):
     deadline = _make_deadline(total_seconds)
     yield
-    _sleep(max(0, deadline.get_num_seconds_remaining()))
+    time_module.sleep(max(0, deadline.get_num_seconds_remaining()))
 
 class _Result(object):
     result = None

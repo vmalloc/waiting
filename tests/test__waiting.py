@@ -9,9 +9,9 @@ class VirtualTimeTest(ForgeTestCase):
         self.predicate_satisfied = False
         self.satisfy_at_time = None
         self.satisfy_after_time = None
-        self.forge.replace_with(waiting, "_sleep", self._sleep)
-        self.forge.replace_with(waiting, "_time", self._time)
-        self.forge.replace_with(waiting.deadlines, "_time", self._time)
+        self.forge.replace_with(waiting.time_module, "sleep", self._sleep)
+        self.forge.replace_with(waiting.time_module, "time", self._time)
+        self.forge.replace_with(waiting.deadlines.time_module, "time", self._time)
     def _sleep(self, delta):
         self.sleeps_performed.append(delta)
         self.virtual_time += delta

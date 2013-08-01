@@ -1,4 +1,7 @@
-from time import time as _time
+try:
+    from flux import current_timeline as time_module
+except ImportError:
+    import time as time_module
 
 class Deadline(object):
     def is_expired(self):
@@ -8,11 +11,11 @@ class Deadline(object):
 class Within(Deadline):
     def __init__(self, seconds):
         super(Within, self).__init__()
-        self._deadline = _time() + seconds
+        self._deadline = time_module.time() + seconds
     def is_expired(self):
-        return _time() >= self._deadline
+        return time_module.time() >= self._deadline
     def get_num_seconds_remaining(self):
-        return self._deadline - _time()
+        return self._deadline - time_module.time()
 
 class Whenever(Deadline):
     def is_expired(self):

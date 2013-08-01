@@ -7,7 +7,7 @@ python:
 env:
   matrix: 
     - ADDITIONAL_SETUP="pip install flux"
-    - ADDITIONAL_SETUP="true"
+    - ADDITIONAL_SETUP=":"
 install: 
   - python setup.py develop
   - python scripts/test_setup.py

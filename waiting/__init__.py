@@ -18,7 +18,8 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
-    wait_msg = "waiting for {0}".format(waiting_for if waiting_for is not None else predicate)
+    if waiting_for is None:
+        waiting_for = str(predicate)
     sleep_generator = _get_sleep_generator(timeout, sleep_seconds)
     while True:
         result.result = predicate()

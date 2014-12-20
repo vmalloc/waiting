@@ -8,3 +8,6 @@ class TimeoutExpired(Exception):
     def __repr__(self):
         return "{0}: {1}".format(type(self).__name__, self)
 
+
+class IllegalArgumentError(ValueError):
+    pass

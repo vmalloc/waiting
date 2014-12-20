@@ -1,5 +1,8 @@
 from forge import ForgeTestCase
+from nose.tools import assert_raises, eq_
 import waiting
+from waiting.exceptions import IllegalArgumentError
+
 
 class VirtualTimeTest(ForgeTestCase):
     def setUp(self):
@@ -91,3 +94,47 @@ class AggregationTest(VirtualTimeTest):
         self.forge.replay()
         waiting.wait(waiting.ALL(self.predicates))
         self.assertEquals(self.virtual_time, len(self.predicates) * 2 - 1)
+
+
+class FirstTestException(Exception):
+    pass
+
+
+class SecondTestException(Exception):
+    pass
+
+
+class ExpectedExceptionsTest(VirtualTimeTest):
+    def raising_predicate(self):
+        if self.virtual_time == 0:
+            raise FirstTestException()
+        return self.predicate()
+
+    def raising_two_exceptions_predicate(self):
+        if self.virtual_time == 1:
+            raise SecondTestException()
+        return self.raising_predicate()
+
+    def test_no_handled_exceptions(self):
+        assert_raises(FirstTestException, waiting.wait, self.raising_predicate)
+
+    def test_another_handled_exceptions(self):
+        assert_raises(SecondTestException, waiting.wait, self.raising_two_exceptions_predicate,
+                      expected_exceptions=FirstTestException)
+
+    def test_one_class(self):
+        self.satisfy_at_time = 3
+        waiting.wait(self.raising_predicate, expected_exceptions=FirstTestException)
+        eq_(self.virtual_time, 3)
+
+    def test_correct_tuple(self):
+        self.satisfy_at_time = 3
+        waiting.wait(self.raising_two_exceptions_predicate,
+                     expected_exceptions=(FirstTestException, SecondTestException))
+        eq_(self.virtual_time, 3)
+
+    def test_none(self):
+        assert_raises(IllegalArgumentError, waiting.wait, self.raising_predicate, expected_exceptions=None)
+
+    def test_non_tuple(self):
+        assert_raises(IllegalArgumentError, waiting.wait, self.raising_predicate, expected_exceptions='Not a tuple')

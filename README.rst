@@ -72,3 +72,11 @@ Exponential backoff is supported for the sleep interval::
  True
  >>> wait(predicate, sleep_seconds=(1, None, 4)) # sleep 1, 4, 16, 64, ... (infinity)
  True
+
+If your predicate is raising some exceptions you might wait for moment when they are not raised::
+
+ >>> from waiting import wait
+ >>> wait(predicate, expected_exceptions=ValueError)
+ True
+ >>> wait(predicate, expected_exceptions=(ValueError, AttributeError))
+ True

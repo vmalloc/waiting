@@ -19,8 +19,9 @@ def wait(*args, **kwargs):
 
 def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None,
              expected_exceptions=()):
-    if not (isinstance(expected_exceptions, tuple) or
-            (inspect.isclass(expected_exceptions) and issubclass(expected_exceptions, Exception))):
+
+    if not isinstance(expected_exceptions, tuple) and not (isinstance(expected_exceptions, type)
+                                                           and issubclass(expected_exceptions, Exception)):
         raise IllegalArgumentError('expected_exceptions should be tuple or Exception subclass')
     timeout = _make_deadline(timeout_seconds)
     if result is None:

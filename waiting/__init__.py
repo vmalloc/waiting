@@ -1,3 +1,5 @@
+import inspect
+
 from .__version__ import __version__
 from contextlib import contextmanager
 
@@ -6,7 +8,8 @@ try:
 except ImportError:
     import time as time_module
 from .deadlines import make_deadline as _make_deadline
-from .exceptions import TimeoutExpired
+from .exceptions import TimeoutExpired, IllegalArgumentError
+
 
 def wait(*args, **kwargs):
     result = _Result()
@@ -14,7 +17,11 @@ def wait(*args, **kwargs):
         pass
     return result.result
 
-def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None):
+def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None,
+             expected_exceptions=()):
+    if not (isinstance(expected_exceptions, tuple) or
+            (inspect.isclass(expected_exceptions) and issubclass(expected_exceptions, Exception))):
+        raise IllegalArgumentError('expected_exceptions should be tuple or Exception subclass')
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
@@ -22,7 +29,10 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
         waiting_for = str(predicate)
     sleep_generator = _get_sleep_generator(timeout, sleep_seconds)
     while True:
-        result.result = predicate()
+        try:
+            result.result = predicate()
+        except expected_exceptions:
+            pass
         if result.result:
             return
         if timeout.is_expired():

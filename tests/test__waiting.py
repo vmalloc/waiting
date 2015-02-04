@@ -1,7 +1,8 @@
+# coding=utf-8
 from forge import ForgeTestCase
 from nose.tools import assert_raises, eq_
 import waiting
-from waiting.exceptions import IllegalArgumentError
+from waiting.exceptions import IllegalArgumentError, TimeoutExpired
 
 
 class VirtualTimeTest(ForgeTestCase):
@@ -138,3 +139,11 @@ class ExpectedExceptionsTest(VirtualTimeTest):
 
     def test_non_tuple(self):
         assert_raises(IllegalArgumentError, waiting.wait, self.raising_predicate, expected_exceptions='Not a tuple')
+
+
+class TestTimeoutException(ForgeTestCase):
+    def test_unicode_logging(self):
+        unicode_string = u'symbols 올 д'
+        timeout = 3
+        instance = TimeoutExpired(timeout, unicode_string)
+        eq_(u'{0}'.format(instance), u'Timeout of {0} seconds expired waiting for {1}'.format(timeout, unicode_string))

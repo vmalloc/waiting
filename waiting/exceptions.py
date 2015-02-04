@@ -7,6 +7,8 @@ class TimeoutExpired(Exception):
         return "Timeout of {0} seconds expired waiting for {1}".format(self._timeout_seconds, self._what)
     def __repr__(self):
         return "{0}: {1}".format(type(self).__name__, self)
+    def __unicode__(self):
+        return u"Timeout of {0} seconds expired waiting for {1}".format(self._timeout_seconds, self._what)
 
 
 class IllegalArgumentError(ValueError):

@@ -17,12 +17,14 @@ def wait(*args, **kwargs):
         pass
     return result.result
 
+
 def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None,
              expected_exceptions=()):
 
     if not isinstance(expected_exceptions, tuple) and not (isinstance(expected_exceptions, type)
                                                            and issubclass(expected_exceptions, Exception)):
-        raise IllegalArgumentError('expected_exceptions should be tuple or Exception subclass')
+        raise IllegalArgumentError(
+            'expected_exceptions should be tuple or Exception subclass')
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
@@ -41,14 +43,17 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
         with _end_sleeping(next(sleep_generator)):
             yield
 
+
 @contextmanager
 def _end_sleeping(total_seconds):
     deadline = _make_deadline(total_seconds)
     yield
     time_module.sleep(max(0, deadline.get_num_seconds_remaining()))
 
+
 class _Result(object):
     result = None
+
 
 def _get_sleep_generator(timeout, sleep_seconds):
     if type(sleep_seconds) not in (tuple, list):
@@ -68,14 +73,22 @@ def _get_sleep_generator(timeout, sleep_seconds):
         if end_sleep is not None:
             current_sleep = min(end_sleep, current_sleep)
 
+
 class Aggregate(object):
+
     def __init__(self, predicates):
         super(Aggregate, self).__init__()
         self.predicates = list(predicates)
+
+
 class ANY(Aggregate):
+
     def __call__(self):
         return any(p() for p in self.predicates)
+
+
 class ALL(Aggregate):
+
     def __call__(self):
         for index in range(len(self.predicates), 0, -1):
             index -= 1

@@ -32,23 +32,32 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
         waiting_for = str(predicate)
     sleep_generator = _get_sleep_generator(timeout, sleep_seconds)
     while True:
-        try:
-            result.result = predicate()
-        except expected_exceptions:
-            pass
-        if result.result:
-            return
-        if timeout.is_expired():
-            raise TimeoutExpired(timeout_seconds, waiting_for)
-        with _end_sleeping(next(sleep_generator)):
+        with _end_sleeping(next(sleep_generator)) as cancel_sleep:
+            try:
+                result.result = predicate()
+            except expected_exceptions:
+                pass
+            if result.result:
+                cancel_sleep()
+                return
+            if timeout.is_expired():
+                raise TimeoutExpired(timeout_seconds, waiting_for)
             yield
 
 
 @contextmanager
 def _end_sleeping(total_seconds):
     deadline = _make_deadline(total_seconds)
-    yield
-    time_module.sleep(max(0, deadline.get_num_seconds_remaining()))
+    sleep_toggle = _SleepToggle()
+    yield sleep_toggle
+    if sleep_toggle.enabled:
+        time_module.sleep(max(0, deadline.get_num_seconds_remaining()))
+
+class _SleepToggle(object):
+    enabled = True
+
+    def __call__(self):
+        self.enabled = False
 
 
 class _Result(object):

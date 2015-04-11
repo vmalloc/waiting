@@ -1,7 +1,11 @@
 from forge import Forge
+import logging
 import waiting
 
 import pytest
+
+
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -36,6 +40,7 @@ def timeline(forge):
             self.predicate_satisfied = False
             self.satisfy_at_time = None
             self.satisfy_after_time = None
+            self.predicate_sleep = 0
 
 
         def sleep(self, delta):
@@ -51,6 +56,8 @@ def timeline(forge):
                 self.predicate_satisfied = True
             if self.satisfy_after_time is not None and self.satisfy_after_time <= self.virtual_time:
                 self.predicate_satisfied = True
+            self.virtual_time += self.predicate_sleep
+            _logger.debug('Predicate: time is now %s', self.virtual_time)
             return self.predicate_satisfied
 
         def raising_predicate(self):

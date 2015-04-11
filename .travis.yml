@@ -3,14 +3,15 @@ python:
   - 2.6
   - 2.7
   - 3.3
+  - 3.4
 
 env:
   matrix: 
     - ADDITIONAL_SETUP="pip install flux"
     - ADDITIONAL_SETUP=":"
 install: 
-  - python setup.py develop
-  - python scripts/test_setup.py
+  - pip install -e .
+  - pip install -r test_requirements.txt
   - "$ADDITIONAL_SETUP"
 # command to run tests, e.g. python setup.py test
-script: nosetests -w tests
+script: py.test tests

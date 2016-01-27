@@ -13,6 +13,10 @@ if platform.python_version() < '2.7':
 setup(name="waiting",
       classifiers = [
           "Programming Language :: Python :: 2.6",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
           ],
       description="Utility for waiting for stuff to happen",
       license="BSD",

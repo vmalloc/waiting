@@ -81,13 +81,13 @@ If your predicate might raise certain exceptions you wish to ignore, you may use
  >>> wait(predicate, expected_exceptions=(ValueError, AttributeError))
  True
 
-If you'd like to maintain updates while waiting for a predicate to complete, you may use ``update_msg`` to pass a lambda to log the status. By default, this is a no-op.
+If you'd like to maintain updates while waiting for a predicate to complete, you may use ``on_poll`` to pass a lambda to perform some behavior after every sleep. By default, this is a no-op.
 
   >>> import logging
   >>> from waiting import wait
   >>> try:
   ...    wait(lambda: False, timeout_seconds=5,               # Timeout after 5 seconds
-  ...          update_msg=lambda: logging.warn("Waiting...")) # Log "Waiting..." six times.
+  ...          on_poll=lambda: logging.warn("Waiting...")) # Log "Waiting..." six times.
   ... except TimeoutExpired:
   ...    pass
   ... else:

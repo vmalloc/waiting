@@ -2,6 +2,7 @@ import inspect
 
 from .__version__ import __version__
 from contextlib import contextmanager
+from types import LambdaType
 
 try:
     from flux import current_timeline as time_module
@@ -19,12 +20,15 @@ def wait(*args, **kwargs):
 
 
 def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None,
-             expected_exceptions=()):
+             update_msg=lambda: None, expected_exceptions=()):
 
     if not isinstance(expected_exceptions, tuple) and not (isinstance(expected_exceptions, type)
                                                            and issubclass(expected_exceptions, Exception)):
         raise IllegalArgumentError(
             'expected_exceptions should be tuple or Exception subclass')
+    if not isinstance(update_msg, LambdaType):
+        raise IllegalArgumentError(
+            'update_msg should be a lambda')
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
@@ -35,6 +39,7 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
         with _end_sleeping(next(sleep_generator)) as cancel_sleep:
             try:
                 result.result = predicate()
+                update_msg()
             except expected_exceptions:
                 pass
             if result.result:

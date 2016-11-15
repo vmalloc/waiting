@@ -22,7 +22,7 @@ If your predicate returns a value, it will be returned as the result of wait()::
  >>> result = object()
  >>> wait(lambda: result) is result
  True
- 
+
 A *timeout* parameter can also be specified::
 
  >>> wait(predicate, timeout_seconds=10.5)
@@ -38,8 +38,8 @@ When a timeout expires without the predicate being fullfilled, an exception is t
  ...     pass
  ... else:
  ...     assert False
- 
- 
+
+
 Sleeping polls the predicate at a certain interval (by default 1 second). The interval can be changed with the *sleep_seconds* argument::
 
  >>> wait(predicate, sleep_seconds=20)
@@ -80,3 +80,12 @@ If your predicate might raise certain exceptions you wish to ignore, you may use
  True
  >>> wait(predicate, expected_exceptions=(ValueError, AttributeError))
  True
+
+If you'd like to maintain updates while waiting for a predicate to complete, you may use ``update_msg`` to pass a lambda to log the status. By default, this is a no-op.
+
+  >>> from waiting import wait
+  >>> wait(lambda: False, update_msg=lambda: print("Waiting...")) # Infinite wait
+  Waiting...
+  Waiting...
+  Waiting...
+  Waiting...

@@ -2,7 +2,6 @@ import inspect
 
 from .__version__ import __version__
 from contextlib import contextmanager
-from types import LambdaType
 
 try:
     from flux import current_timeline as time_module
@@ -26,9 +25,9 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
                                                            and issubclass(expected_exceptions, Exception)):
         raise IllegalArgumentError(
             'expected_exceptions should be tuple or Exception subclass')
-    if not isinstance(on_poll, LambdaType):
+    if not callable(on_poll):
         raise IllegalArgumentError(
-            'on_poll should be a lambda')
+            'on_poll should be callable')
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()

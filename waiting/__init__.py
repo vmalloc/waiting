@@ -19,15 +19,20 @@ def wait(*args, **kwargs):
 
 
 def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, waiting_for=None,
-             expected_exceptions=()):
+             on_poll=None, expected_exceptions=()):
 
     if not isinstance(expected_exceptions, tuple) and not (isinstance(expected_exceptions, type)
                                                            and issubclass(expected_exceptions, Exception)):
         raise IllegalArgumentError(
             'expected_exceptions should be tuple or Exception subclass')
+    if not callable(on_poll) and on_poll is not None:
+        raise IllegalArgumentError(
+            'on_poll should be callable')
     timeout = _make_deadline(timeout_seconds)
     if result is None:
         result = _Result()
+    if on_poll is None:
+        on_poll = lambda: None
     if waiting_for is None:
         waiting_for = str(predicate)
     sleep_generator = _get_sleep_generator(timeout, sleep_seconds)
@@ -35,6 +40,7 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
         with _end_sleeping(next(sleep_generator)) as cancel_sleep:
             try:
                 result.result = predicate()
+                on_poll()
             except expected_exceptions:
                 pass
             if result.result:

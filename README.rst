@@ -83,12 +83,12 @@ If your predicate might raise certain exceptions you wish to ignore, you may use
 
 If you'd like to maintain updates while waiting for a predicate to complete, you may use ``on_poll`` to pass a function to perform some behavior after every sleep. By default, this is a no-op.
 
-  >>> import logging
-  >>> from waiting import wait
-  >>> try:
-  ...    wait(lambda: False, timeout_seconds=5,               # Timeout after 5 seconds
-  ...          on_poll=lambda: logging.warn("Waiting...")) # Log "Waiting..." six times.
-  ... except TimeoutExpired:
-  ...    pass
-  ... else:
-  ...    assert False
+ >>> import logging
+ >>> from waiting import wait
+ >>> try:
+ ...    wait(lambda: False, timeout_seconds=5,               # Timeout after 5 seconds
+ ...          on_poll=lambda: logging.warn("Waiting...")) # Log "Waiting..." six times.
+ ... except TimeoutExpired:
+ ...    pass
+ ... else:
+ ...    assert False

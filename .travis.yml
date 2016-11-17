@@ -1,18 +1,25 @@
 language: python
 sudo: false
 python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
+- 2.6
+- 2.7
+- 3.3
+- 3.4
+- 3.5
 env:
-  matrix: 
-    - ADDITIONAL_SETUP="pip install flux"
-    - ADDITIONAL_SETUP=":"
-install: 
-  - pip install -e .
-  - pip install -r test_requirements.txt
-  - "$ADDITIONAL_SETUP"
-# command to run tests, e.g. python setup.py test
+  matrix:
+  - ADDITIONAL_SETUP="pip install flux"
+  - ADDITIONAL_SETUP=":"
+install:
+- pip install -e .
+- pip install -r test_requirements.txt
+- $ADDITIONAL_SETUP
 script: py.test tests
+deploy:
+  provider: pypi
+  user: vmalloc
+  password:
+    secure: ujgrZvEm1GIqAJ44g54kJol51/odRYOt3fcqobzpR1LUbiUzI/h0YeuoIKYlCJPqhdGZK3k1C6JrE2dHxZAcP5ozncRgRtBhE0mNbrmnmbkZJxlfCWg0ZHeA0tMPUk53qgB8drCFc6TstAwvDIdgUAtfvqNpQjY49ECciXlyE7Q=
+  on:
+    tags: true
+    repo: vmalloc/waiting

@@ -102,3 +102,36 @@ def test_unicode_logging():
     timeout = 3
     instance = TimeoutExpired(timeout, unicode_string)
     assert u'{0}'.format(instance) == u'Timeout of {0} seconds expired waiting for {1}'.format(timeout, unicode_string)
+
+
+@pytest.mark.parametrize(['exception', 'expected_exceptions'], [
+                         (StopIteration, ()),
+                         (TimeoutExpired, StopIteration)])
+def test_stop_iteration_inside_predicate(exception, expected_exceptions):
+    def predicate():
+        raise StopIteration()
+    with pytest.raises(exception):
+        waiting.wait(predicate, timeout_seconds=0,
+                     expected_exceptions=expected_exceptions)
+
+
+def test_nexted_stop_iteration_preserve_exception():
+    expected_exception = StopIteration('foo')
+
+    def predicate():
+        raise expected_exception
+
+    with pytest.raises(StopIteration) as ex:
+        waiting.wait(predicate, timeout_seconds=0)
+    assert ex.value is expected_exception
+
+
+def test_nexted_stop_iteration_preserve_traceback():
+    expected_exception = StopIteration('foo')
+
+    def predicate():
+        raise expected_exception
+
+    with pytest.raises(StopIteration) as ex:
+        waiting.wait(predicate, timeout_seconds=0)
+    assert '        raise expected_exception' in ex.traceback[-1].statement.lines

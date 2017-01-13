@@ -1,4 +1,5 @@
 import inspect
+import sys
 
 from .__version__ import __version__
 from contextlib import contextmanager
@@ -8,13 +9,16 @@ try:
 except ImportError:
     import time as time_module
 from .deadlines import make_deadline as _make_deadline
-from .exceptions import TimeoutExpired, IllegalArgumentError
+from .exceptions import TimeoutExpired, IllegalArgumentError, NestedStopIteration
 
 
 def wait(*args, **kwargs):
     result = _Result()
-    for x in iterwait(result=result, *args, **kwargs):
-        pass
+    try:
+        for x in iterwait(result=result, *args, **kwargs):
+            pass
+    except NestedStopIteration as e:
+        e.reraise()
     return result.result
 
 
@@ -42,6 +46,9 @@ def iterwait(predicate, timeout_seconds=None, sleep_seconds=1, result=None, wait
                     on_poll()
             except expected_exceptions:
                 pass
+            except StopIteration:
+                exc_info = sys.exc_info()
+                raise NestedStopIteration(exc_info)
             if result.result:
                 cancel_sleep()
                 return

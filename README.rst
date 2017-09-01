@@ -28,7 +28,7 @@ A *timeout* parameter can also be specified::
  >>> wait(predicate, timeout_seconds=10.5)
  True
 
-When a timeout expires without the predicate being fullfilled, an exception is thrown::
+When a timeout expires without the predicate being fulfilled, an exception is thrown::
 
 
  >>> try:

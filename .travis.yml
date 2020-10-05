@@ -10,10 +10,9 @@ env:
   - ADDITIONAL_SETUP="pip install flux"
   - ADDITIONAL_SETUP=":"
 install:
-- pip install -e .
-- pip install -r test_requirements.txt
+- pip install -e ".[testing]"
 - $ADDITIONAL_SETUP
-script: py.test tests
+script: pytest tests
 deploy:
   provider: pypi
   user: vmalloc

@@ -1,1 +1,3 @@
-__version__ = "1.4.1"
+import pkg_resources
+
+__version__ = pkg_resources.get_distribution('waiting').version

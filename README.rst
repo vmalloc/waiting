@@ -87,7 +87,7 @@ If you'd like to maintain updates while waiting for a predicate to complete, you
  >>> from waiting import wait
  >>> try:
  ...    wait(lambda: False, timeout_seconds=5,               # Timeout after 5 seconds
- ...          on_poll=lambda: logging.warn("Waiting...")) # Log "Waiting..." six times.
+ ...          on_poll=lambda: logging.warning("Waiting...")) # Log "Waiting..." six times.
  ... except TimeoutExpired:
  ...    pass
  ... else:

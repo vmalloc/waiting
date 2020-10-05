@@ -30,3 +30,6 @@ pip-log.txt
 .#*
 .achievements
 .env
+.eggs
+AUTHORS
+ChangeLog
